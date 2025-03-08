@@ -8,69 +8,84 @@ namespace RandevuSistemi.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AuthController(UserManager<ApplicationUser> userManager,
+                              SignInManager<ApplicationUser> signInManager,
+                              RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
-        public IActionResult Register() => View();
+        // GET: Auth/Login
+        public IActionResult Login()
+        {
+            return View();
+        }
 
+        // POST: Auth/Login
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        {
+            returnUrl ??= Url.Content("~/"); // Varsayılan olarak ana sayfaya yönlendir
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(model.UserName);
+
+                if (user != null)
+                {
+                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
+                    if (result.Succeeded)
+                    {
+                        // Kullanıcı giriş yaptıysa yönlendirme
+                        return RedirectToAction("Create", "Appointment"); // Randevu sayfasına yönlendir
+                    }
+                }
+                ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi.");
+            }
+
+            return View(model);
+        }
+
+        // GET: Auth/Register
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        // POST: Auth/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                // ModelState hatalarını console'a yazdıralım
-                foreach (var key in ModelState.Keys)
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, FullName = model.FullName };
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
                 {
-                    foreach (var error in ModelState[key].Errors)
-                    {
-                        Console.WriteLine($"Hata - {key}: {error.ErrorMessage}");
-                    }
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Create", "Appointment"); // Kayıt olduktan sonra randevu sayfasına yönlendir
                 }
 
-                return View(model); // Hatalar varsa form tekrar gösterilir
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
-
-            var user = new ApplicationUser { UserName = model.UserName, FullName = model.FullName,Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error.Description);
-            }
-
             return View(model);
         }
 
-        public IActionResult Login() => View();
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (!ModelState.IsValid) return View(model);
-
-            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
-            if (result.Succeeded) return RedirectToAction("Index", "Home");
-
-            ModelState.AddModelError("", "Geçersiz giriş.");
-            return View(model);
-        }
-
+        // Çıkış yapmak
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", "Auth");
         }
     }
 }
-

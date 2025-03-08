@@ -1,0 +1,25 @@
+﻿@model RandevuSistemi.Models.Appointment
+
+<h2>Yeni Randevu Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="AppointmentDate">Randevu Tarihi</label>
+        <input asp-for="AppointmentDate" class="form-control" type="datetime-local" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ServiceId">Randevu Türü</label>
+        <select asp-for="ServiceId" asp-items="ViewBag.Services" class="form-control"></select>
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
