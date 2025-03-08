@@ -41,8 +41,12 @@ namespace RandevuSistemi.Controllers
                     var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
                     if (result.Succeeded)
                     {
-                        // Kullanıcı giriş yaptıysa yönlendirme
-                        return RedirectToAction("Create", "Appointment"); // Randevu sayfasına yönlendir
+                       if (await _userManager.IsInRoleAsync(user, "Admin"))
+                        {
+                            return RedirectToAction("AllAppointments", "Appointment");  // Admin için tüm randevular sayfasına yönlendir
+                        }
+
+                    return RedirectToAction("Create", "Appointment");  // Burada kullanıcıyı kendi sayfasına yönlendirebilirsiniz
                     }
                 }
                 ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi.");
@@ -70,7 +74,12 @@ namespace RandevuSistemi.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Create", "Appointment"); // Kayıt olduktan sonra randevu sayfasına yönlendir
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        return RedirectToAction("AllAppoinments", "Appointment");  // Admin için tüm randevular sayfasına yönlendir
+                    }
+
+                    return RedirectToAction("Create", "Appointment");  // Burada kullanıcıyı kendi sayfasına yönlendirebilirsiniz
                 }
 
                 foreach (var error in result.Errors)
