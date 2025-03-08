@@ -8,6 +8,7 @@
             <th>Randevu Tarihi</th>
             <th>Randevu Türü</th>
             <th>Adı Soyadı</th>
+            <th>Durum</th>
             @if (User.IsInRole("Admin"))
             {
                 <th>İşlemler</th>
@@ -21,6 +22,7 @@
                 <td>@item.AppointmentDate</td>
                 <td>@item.Service.Name</td>
                 <td>@item.User.FullName</td>
+                <td>@item.Status</td>
                 @if (User.IsInRole("Admin"))
                 {
                     <td>
