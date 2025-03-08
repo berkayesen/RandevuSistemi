@@ -56,9 +56,9 @@
         $.get("/Appointment/Edit/" + id, function (data) {
             $("#editId").val(data.id);
             $("#editAppointmentDate").val(data.appointmentDate);
-            $("#editUserId").val(data.userId); // Kullanıcı ID'sini de al
+            $("#editUserId").val(data.userId);
 
-            $("#editModal").modal("show"); // Modalı aç
+            $("#editModal").modal("show");
         });
     }
 
@@ -66,7 +66,7 @@
         var appointment = {
             Id: $("#editId").val(),
             AppointmentDate: $("#editAppointmentDate").val(),
-            UserId: $("#editUserId").val() || "" // Boş olursa bile gönder
+            UserId: $("#editUserId").val() || ""
         };
 
         $.ajax({

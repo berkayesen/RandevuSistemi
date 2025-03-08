@@ -19,13 +19,13 @@ namespace RandevuSistemi.Controllers
             _roleManager = roleManager;
         }
 
-        // GET: Auth/Login
+        //GET: Auth/Login
         public IActionResult Login()
         {
             return View();
         }
 
-        // POST: Auth/Login
+        //POST: Auth/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
@@ -43,10 +43,10 @@ namespace RandevuSistemi.Controllers
                     {
                        if (await _userManager.IsInRoleAsync(user, "Admin"))
                         {
-                            return RedirectToAction("AllAppointments", "Appointment");  // Admin için tüm randevular sayfasına yönlendir
+                            return RedirectToAction("AllAppointments", "Appointment");
                         }
 
-                    return RedirectToAction("Create", "Appointment");  // Burada kullanıcıyı kendi sayfasına yönlendirebilirsiniz
+                    return RedirectToAction("Create", "Appointment");
                     }
                 }
                 ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi.");
@@ -76,10 +76,10 @@ namespace RandevuSistemi.Controllers
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     if (await _userManager.IsInRoleAsync(user, "Admin"))
                     {
-                        return RedirectToAction("AllAppoinments", "Appointment");  // Admin için tüm randevular sayfasına yönlendir
+                        return RedirectToAction("AllAppoinments", "Appointment");
                     }
 
-                    return RedirectToAction("Create", "Appointment");  // Burada kullanıcıyı kendi sayfasına yönlendirebilirsiniz
+                    return RedirectToAction("Create", "Appointment");
                 }
 
                 foreach (var error in result.Errors)
@@ -90,7 +90,7 @@ namespace RandevuSistemi.Controllers
             return View(model);
         }
 
-        // Çıkış yapmak
+        // Çıkış yapma
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();

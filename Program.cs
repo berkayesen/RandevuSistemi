@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MSSQL veritabanı bağlantısını al
+// MSSQL veritabanı bağlantısı
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -17,19 +17,17 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
 
+builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
-// Admin kullanıcı oluşturma fonksiyonunu başlatmadan önce uygulamanın yapılandırması tamamlanmalı
+// Admin kullanıcı oluşturma
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await CreateAdminUserAsync(services);  // Admin kullanıcı oluşturma fonksiyonu
+    await CreateAdminUserAsync(services);
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -60,7 +58,6 @@ static async Task CreateAdminUserAsync(IServiceProvider serviceProvider)
         await roleManager.CreateAsync(new IdentityRole(adminRole));
     }
 
-    // Admin kullanıcı bilgileri
     string adminEmail = "admin@example.com";
     string adminPassword = "Admin123!";
     string adminNick = "admin";
@@ -79,11 +76,11 @@ static async Task CreateAdminUserAsync(IServiceProvider serviceProvider)
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(adminUser, adminRole);
-            Console.WriteLine("✅ Admin kullanıcı başarıyla oluşturuldu.");
+            Console.WriteLine("Admin kullanıcı başarıyla oluşturuldu.");
         }
         else
         {
-            Console.WriteLine("❌ Admin oluşturulurken hata oluştu.");
+            Console.WriteLine("Admin oluşturulurken hata oluştu.");
         }
     }
 }
