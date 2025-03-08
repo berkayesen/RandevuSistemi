@@ -21,6 +21,7 @@ namespace RandevuSistemi.Models
         [Required(ErrorMessage = "Şifre tekrar zorunludur.")]
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "Şifreler eşleşmiyor.")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$", ErrorMessage = "Şifre en az 6 karakter olmalı, bir büyük harf, bir rakam ve bir özel karakter içermelidir.")]
         public string ConfirmPassword { get; set; }
     }
 }
